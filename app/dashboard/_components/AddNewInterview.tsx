@@ -11,21 +11,60 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { chatSession } from '@/utils/GeminiAIModel';
+import { LoaderCircle } from 'lucide-react';
+import { useUser } from '@clerk/nextjs';
 
 const AddNewInterview = () => {
     const [openDialog, setOpenDialog] = useState(false);
-    const [jobPosition, setJobPosition ] = useState('');
-    const [jobDescription, setJobDescription] = useState('');
+    const [jobPosition, setJobPosition] = useState('');
+    const [jobDesc, setJobDesc] = useState('');
     const [jobExperience, setJobExperience] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [jsonResponse, setJsonResponse] = useState([]);
+    const { user } = useUser();
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        setLoading(true);
         e.preventDefault();
 
-        const InputPrompt = "Job position: " + jobPosition + ", Job Description: " + jobDescription + ", Years of Experience: " + jobExperience + ".Depending on the provided Job Position, Job Description, and Years of Experience, give us " + process.env.NEXT_PUBLIC_INTERVIEW_QUESTION_COUNT! + " interview questions along with short and accurate answers in JSON format";
-        
-        const result = await chatSession.sendMessage(InputPrompt);
-        const MockJsonResp = (result.response.text()).replace('```json', '').replace('```', '')
-        console.log(JSON.parse(MockJsonResp));
+        const InputPrompt = "Job position: " + jobPosition + ", Job Description: " + jobDesc + ", Years of Experience: " + jobExperience + ".Depending on the provided Job Position, Job Description, and Years of Experience, give us " + process.env.NEXT_PUBLIC_INTERVIEW_QUESTION_COUNT! + " interview questions along with short and accurate answers in JSON format";
+
+        try {
+            const result = await chatSession.sendMessage(InputPrompt);
+            const MockJsonResp = (await result.response.text())
+                .replace('```json', '')
+                .replace('```', '');
+
+            setJsonResponse(JSON.parse(MockJsonResp));
+
+            if (MockJsonResp) {
+                const response = await fetch('/api/interviews', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        jobPosition,
+                        jobDesc,
+                        jobExperience,
+                        MockJsonResp,
+                        createdBy: user?.primaryEmailAddress?.emailAddress || 'anonymous',
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    console.log('Inserted Mock ID:', data.mockId);
+                } else {
+                    console.error('Failed to insert data:', data.error);
+                }
+            } else {
+                console.error('AI response is empty.');
+            }
+        } catch (error) {
+            console.error('Error submitting data:', error);
+        } finally {
+            setLoading(false);
+        }
     }
     return (
         <div>
@@ -46,22 +85,28 @@ const AddNewInterview = () => {
 
                                     <div className='mt-7 my-3'>
                                         <label>Job Role/Job Position</label>
-                                        <Input placeholder='Ex. Full Stack Developer' required onChange={(event) => setJobPosition(event.target.value)}/>
+                                        <Input placeholder='Ex. Full Stack Developer' required onChange={(event) => setJobPosition(event.target.value)} />
                                     </div>
 
                                     <div className='my-3'>
                                         <label>Job Description/TechStack (In Short)</label>
-                                        <Textarea placeholder='Ex. React, Angular, Flask, Springboot, etc' required onChange={(event) => setJobDescription(event.target.value)}/>
+                                        <Textarea placeholder='Ex. React, Angular, Flask, Springboot, etc' required onChange={(event) => setJobDesc(event.target.value)} />
                                     </div>
 
                                     <div className='my-3'>
                                         <label>Years of experience</label>
-                                        <Input placeholder='Ex. 5' type='number' max="100" required onChange={(event) => setJobExperience(event.target.value)}/>
+                                        <Input placeholder='Ex. 5' type='number' max="100" required onChange={(event) => setJobExperience(event.target.value)} />
                                     </div>
                                 </div>
                                 <div className='flex gap-5 justify-end'>
                                     <Button type='button' variant="ghost" onClick={() => setOpenDialog(false)}>Cancel</Button>
-                                    <Button type='submit'>Start Interview</Button>
+                                    <Button type='submit' disabled={loading}>
+                                        {loading ?
+                                            <>
+                                                <LoaderCircle className='animate-spin' />&apos;Generating from AI&apos;
+                                            </> : 'Start Interview'
+                                        }
+                                    </Button>
                                 </div>
                             </form>
                         </DialogDescription>
