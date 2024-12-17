@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export async function GET(request: Request, { params }: { params: { interviewId: string } }) {
     try {
-        const { interviewId } = params;
+        const { interviewId } = await params;
 
         const interviewData = await prisma.mockInterview.findUnique({
             where: { mockId: interviewId },

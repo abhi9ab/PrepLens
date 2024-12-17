@@ -37,17 +37,20 @@ const StartInterview = () => {
         };
 
         fetchData();
-    }, [interviewId, interviewQuestions]);
+    }, []);
 
     return (
-        <div>
-            <div className='grid grid-cols-1 md:grid-cols-2'>
+        <div className='my-10'>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-10'>
                 <QuestionSection 
                     interviewQuestions={interviewQuestions}
                     activeQuestionIndex={activeQuestionIndex}
                 />
 
-                <RecordAnswerSection />
+                <RecordAnswerSection 
+                    interviewQuestions={interviewQuestions}
+                    activeQuestionIndex={activeQuestionIndex}
+                />
             </div>
         </div>
     )

@@ -62,7 +62,7 @@ const InterviewClient = ({ interviewId, jobPosition, jobDesc, jobExperience }: I
             </div>
             <div className='flex justify-center items-center'>
                 <Link href={`/dashboard/interview/${interviewId}/start`}>
-                    <Button>Start</Button>
+                    <Button variant='outline'>Start</Button>
                 </Link>
             </div>
         </div>
