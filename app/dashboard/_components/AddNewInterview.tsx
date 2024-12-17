@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { chatSession } from '@/utils/GeminiAIModel';
 import { LoaderCircle } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
 
 const AddNewInterview = () => {
     const [openDialog, setOpenDialog] = useState(false);
@@ -21,7 +22,9 @@ const AddNewInterview = () => {
     const [jobExperience, setJobExperience] = useState('');
     const [loading, setLoading] = useState(false);
     const [jsonResponse, setJsonResponse] = useState([]);
+
     const { user } = useUser();
+    const router = useRouter();
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         setLoading(true);
@@ -54,6 +57,7 @@ const AddNewInterview = () => {
 
                 if (response.ok) {
                     console.log('Inserted Mock ID:', data.mockId);
+                    router.push('/dashboard/interview/' + data.mockId);
                 } else {
                     console.error('Failed to insert data:', data.error);
                 }
@@ -64,6 +68,7 @@ const AddNewInterview = () => {
             console.error('Error submitting data:', error);
         } finally {
             setLoading(false);
+            setOpenDialog(false);
         }
     }
     return (
