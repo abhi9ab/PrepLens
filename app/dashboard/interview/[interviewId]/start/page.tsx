@@ -10,14 +10,16 @@ interface InterviewQuestion {
 }
 
 const StartInterview = () => {
-    const { interviewId } = useParams(); // Extract interviewId from the route
+    const { interviewId } = useParams(); 
+    const validInterviewId = Array.isArray(interviewId) ? interviewId[0] : interviewId || '';
+
     const [interviewQuestions, setInterviewQuestions] = useState<InterviewQuestion[]>([]);
     const [ activeQuestionIndex, setActiveQuestionIndex ] = useState(0);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`/api/interviews/${interviewId}`);
+                const response = await fetch(`/api/interviews/${validInterviewId}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch interview data');
                 }
@@ -50,6 +52,7 @@ const StartInterview = () => {
                 <RecordAnswerSection 
                     interviewQuestions={interviewQuestions}
                     activeQuestionIndex={activeQuestionIndex}
+                    interviewId={validInterviewId}
                 />
             </div>
         </div>
