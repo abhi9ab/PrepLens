@@ -28,6 +28,7 @@ const RecordAnswerSection = ({ interviewQuestions, activeQuestionIndex, intervie
         results,
         startSpeechToText,
         stopSpeechToText,
+        setResults
     } = useSpeechToText({
         continuous: true,
         crossBrowser: true,
@@ -74,6 +75,7 @@ const RecordAnswerSection = ({ interviewQuestions, activeQuestionIndex, intervie
             const JsonFeedbackResp = JSON.parse(mockJsonResp);
             console.log("JsonFeedbackResp",JsonFeedbackResp);
 
+            // Post data to API
             const response = await fetch('/api/user-answer', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -89,35 +91,21 @@ const RecordAnswerSection = ({ interviewQuestions, activeQuestionIndex, intervie
                 }),
             });
 
-            console.log('Response status:', response.status);
-            console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-
             if (response.ok) {
-                const responseBody = await response.text();
-                console.log('Success response body:', responseBody);
                 toast.success('Answer saved successfully!');
-                setUserAnswer(''); // Reset answer for the next question
+                setUserAnswer('');
+                setResults([]);
             } else {
-                try {
-                    const errorBody = await response.text();
-                    const errorHeaders = Object.fromEntries(response.headers.entries());
-                    console.error('Error status:', response.status);
-                    console.error('Error headers:', errorHeaders);
-                    console.error('Error response body:', errorBody);
-                    
-                    toast.error(`Error (${response.status}): ${errorBody || 'Unknown error occurred'}`);
-                } catch (parseError) {
-                    console.error('Error parsing error response:', parseError);
-                    toast.error(`Unexpected error (${response.status})`);
-                }
+                const error = await response.json();
+                toast.error(`Error: ${error.error}`);
             }
         } catch (error) {
             console.error('Error generating feedback or saving answer:', error);
             toast.error('An error occurred. Please try again.');
-        } finally {
-            setUserAnswer('');
-            setLoading(false);
         }
+        setUserAnswer('');
+        setResults([]);
+        setLoading(false);
     }
 
     return (
@@ -141,7 +129,7 @@ const RecordAnswerSection = ({ interviewQuestions, activeQuestionIndex, intervie
                 onClick={startStopRecording}
             >
                 {isRecording ?
-                    <h2 className='bg-red-500 animate-pulse flex gap-2 items-center'>
+                    <h2 className='text-red-500 animate-pulse flex gap-2 items-center'>
                         <StopCircle /><span>Stop Recording</span>
                     </h2>
                     :
