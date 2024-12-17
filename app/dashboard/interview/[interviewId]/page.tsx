@@ -8,7 +8,6 @@ interface Params {
 export default async function InterviewPage({ params }: Params) {
     const { interviewId } = params;
 
-    // Fetch interview data from Prisma
     const interview = await prisma.mockInterview.findUnique({
         where: { mockId: interviewId },
     });
