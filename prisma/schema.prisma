@@ -22,5 +22,5 @@ model mockInterview {
   jobExperience String
   createdBy     String
   createdAt     String?
-  mockId        String
+  mockId        String @unique
 }
