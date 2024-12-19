@@ -6,7 +6,7 @@ interface Params {
 }
 
 export default async function InterviewPage({ params }: Params) {
-    const { interviewId } = params;
+    const { interviewId } = await params;
 
     const interview = await prisma.mockInterview.findUnique({
         where: { mockId: interviewId },

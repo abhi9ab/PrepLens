@@ -21,7 +21,7 @@ model mockInterview {
 
 model UserAnswer {
   id            Int    @id @default(autoincrement())
-  mockIdRef     String @unique
+  mockIdRef     String
   question      String
   correctAnswer String
   userAnswer    String

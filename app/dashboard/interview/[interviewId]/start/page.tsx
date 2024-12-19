@@ -27,10 +27,10 @@ const StartInterview = () => {
                 }
 
                 const data = await response.json();
-                const parsedData = JSON.parse(data.jsonMockResp); // Parse JSON content
+                const parsedData = JSON.parse(data.jsonMockResp);
 
-                if (parsedData?.interview_questions) {
-                    setInterviewQuestions(parsedData.interview_questions);
+                if (parsedData) {
+                    setInterviewQuestions(parsedData);
                 } else {
                     throw new Error('Invalid JSON structure');
                 }

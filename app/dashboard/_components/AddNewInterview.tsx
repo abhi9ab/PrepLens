@@ -30,13 +30,20 @@ const AddNewInterview = () => {
         setLoading(true);
         e.preventDefault();
 
-        const InputPrompt = "Job position: " + jobPosition + ", Job Description: " + jobDesc + ", Years of Experience: " + jobExperience + ".Depending on the provided Job Position, Job Description, and Years of Experience, give us " + process.env.NEXT_PUBLIC_INTERVIEW_QUESTION_COUNT! + " interview questions along with short and accurate answers in JSON format";
+        const InputPrompt = "Job position: " 
+                            + jobPosition + 
+                            ", Job Description: " 
+                            + jobDesc + 
+                            ", Years of Experience: " 
+                            + jobExperience + 
+                            ".Depending on the provided Job Position, Job Description, and Years of Experience, give us "
+                            + process.env.NEXT_PUBLIC_INTERVIEW_QUESTION_COUNT! + 
+                            " interview questions along with short and accurate answers in JSON format with fields 'question' and 'answer'.";
 
         try {
             const result = await chatSession.sendMessage(InputPrompt);
-            const MockJsonResp = (await result.response.text())
-                .replace('```json', '')
-                .replace('```', '');
+            console.log(result.response.text());
+            const MockJsonResp = (await result.response.text()).replace('```json', '').replace('```', '');
 
             setJsonResponse(JSON.parse(MockJsonResp));
 
@@ -108,7 +115,7 @@ const AddNewInterview = () => {
                                     <Button type='submit' disabled={loading}>
                                         {loading ?
                                             <>
-                                                <LoaderCircle className='animate-spin' />&apos;Generating from AI&apos;
+                                                <LoaderCircle className='animate-spin' />Generating from AI
                                             </> : 'Start Interview'
                                         }
                                     </Button>

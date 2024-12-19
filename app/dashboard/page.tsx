@@ -1,12 +1,13 @@
 import React from "react";
 import AddNewInterview from "./_components/AddNewInterview";
-import { useUser } from "@clerk/nextjs";
+// import { useUser } from "@clerk/nextjs";
 import InterviewListServer from "./_components/InterviewListServer";
+import { currentUser } from "@clerk/nextjs/server";
 
-const Dashboard = () => {
-  const { user } = useUser();
-  const userEmail = user?.primaryEmailAddress?.emailAddress || null;
-
+const Dashboard = async () => {
+  const user = await currentUser();
+  
+  const userEmail = user?.emailAddresses?.[0]?.emailAddress || null;
   return (
     <div className="p-10">
       <h2 className="font-bold text-2xl">Dashboard</h2>

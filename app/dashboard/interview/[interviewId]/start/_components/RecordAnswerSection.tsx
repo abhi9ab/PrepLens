@@ -68,12 +68,10 @@ const RecordAnswerSection = ({ interviewQuestions, activeQuestionIndex, intervie
 
         try {
             const result = await chatSession.sendMessage(feedbackPrompt);
-
-            const mockJsonResp = result.response.text()
-                .replace('```json', '')
-                .replace('```', '');
+            console.log(result.response.text());
+            const mockJsonResp = (await result.response.text()).replace('```json', '').replace('```', '');
             const JsonFeedbackResp = JSON.parse(mockJsonResp);
-            console.log("JsonFeedbackResp",JsonFeedbackResp);
+            console.log("JsonFeedbackResp", JsonFeedbackResp);
 
             // Post data to API
             const response = await fetch('/api/user-answer', {
@@ -102,10 +100,11 @@ const RecordAnswerSection = ({ interviewQuestions, activeQuestionIndex, intervie
         } catch (error) {
             console.error('Error generating feedback or saving answer:', error);
             toast.error('An error occurred. Please try again.');
+        } finally {
+            setUserAnswer('');
+            setResults([]);
+            setLoading(false);
         }
-        setUserAnswer('');
-        setResults([]);
-        setLoading(false);
     }
 
     return (
