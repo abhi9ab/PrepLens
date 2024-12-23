@@ -8,4 +8,3 @@ export interface Interview {
     createdAt: string | null;
     mockId: string;
   }
-  
