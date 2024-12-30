@@ -18,5 +18,7 @@ export interface Answer {
   feedback: string,
   rating: string,
   userEmail: string,
-  createdAt: string
+  createdAt: string,
+  behavioralFeedback: string,
+  behavioralMetrics: JSON
 }

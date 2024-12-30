@@ -34,7 +34,6 @@ const StartInterview = () => {
                 } else {
                     throw new Error('Invalid JSON structure');
                 }
-                console.log(interviewQuestions);
             } catch (err) {
                 console.error('Error:', err);
             }

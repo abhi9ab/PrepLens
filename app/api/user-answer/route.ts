@@ -4,15 +4,12 @@ import { prisma } from "@/lib/prisma";
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    console.log("Received data", data);
-
-    const { mockIdRef, question, correctAnswer, userAnswer, feedback, rating, userEmail, createdAt } = data;
+    console.log("data", data);
+    const { mockIdRef, question, correctAnswer, userAnswer, feedback, rating, userEmail, createdAt, behavioralFeedback, behavioralMetrics } = data;
 
     if (!mockIdRef || !question || !userAnswer) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
-
-    console.log("Prisma client", prisma)
 
     const newUserAnswer = await prisma.userAnswer.create({
       data: {
@@ -24,10 +21,11 @@ export async function POST(request: Request) {
         rating: rating ? rating.toString() : '0',
         userEmail,
         createdAt: createdAt || new Date().toISOString(),
+        behavioralFeedback: behavioralFeedback || '',
+        behavioralMetrics: behavioralMetrics || ''
       },
     });
 
-    console.log("Database Save Successful:", newUserAnswer);
     return NextResponse.json(newUserAnswer, { status: 201 });
   } catch (error) {
     console.error('Error saving user answer:', error);

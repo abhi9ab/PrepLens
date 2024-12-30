@@ -24,7 +24,7 @@ const InterviewItemCard: React.FC<InterviewItemCardProps> = ({ interview }) => {
     }
 
     return (
-        <div className='border shadow-sm roun p-3'>
+        <div className='flex flex-col gap-2 border shadow-sm rounded-xl p-3'>
             <h2 className='font-bold text-primary'>{interview?.jobPosition}</h2>
             <h2 className='text-sm'>{interview?.jobExperience} Years of Experience</h2>
             <h2 className='text-xs'>Created at {interview?.createdAt}</h2>

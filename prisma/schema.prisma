@@ -20,13 +20,15 @@ model mockInterview {
 }
 
 model UserAnswer {
-  id            Int    @id @default(autoincrement())
-  mockIdRef     String
-  question      String
-  correctAnswer String
-  userAnswer    String
-  feedback      String
-  rating        String
-  userEmail     String
-  createdAt     String
+  id                 Int     @id @default(autoincrement())
+  mockIdRef          String
+  question           String
+  correctAnswer      String
+  userAnswer         String
+  feedback           String
+  rating             String
+  userEmail          String
+  createdAt          String
+  behavioralFeedback String?
+  behavioralMetrics  Json?
 }

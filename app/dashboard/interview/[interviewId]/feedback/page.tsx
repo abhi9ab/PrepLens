@@ -6,7 +6,7 @@ interface Params {
 }
 
 export default async function FeedbackPage({ params }: Params) {
-  const { interviewId } = params;
+  const { interviewId } = await params;
 
   // Fetch data from Prisma
   const feedbackList = await prisma.userAnswer.findMany({

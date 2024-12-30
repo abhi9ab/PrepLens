@@ -6,18 +6,13 @@ import {
     DialogDescription,
     DialogHeader,
     DialogTitle,
+    DialogTrigger
 } from "@/components/ui/dialog"
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { LoaderCircle } from 'lucide-react';
 import { chatSession } from '@/utils/GeminiAIModel';
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { ChevronsUpDown } from "lucide-react";
 
 interface RenderPdfProps {
     pdfText: string | null;
@@ -40,7 +35,6 @@ const AtsScore = ({ pdfText }: RenderPdfProps) => {
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         setLoading(true);
         e.preventDefault();
-        console.log(pdfText);
 
         const InputPrompt = `
             Hey Act Like a skilled or very experience ATS(Application Tracking System)
@@ -59,7 +53,6 @@ const AtsScore = ({ pdfText }: RenderPdfProps) => {
         `
         try {
             const result = await chatSession.sendMessage(InputPrompt);
-            console.log('Raw response:', await result.response.text());
             const MockJsonResp = (await result.response.text())
                 .replace('```json', '')
                 .replace('```', '');
@@ -80,16 +73,18 @@ const AtsScore = ({ pdfText }: RenderPdfProps) => {
     }
     return (
         <div className='w-full mx-auto space-y-4'>
-            <div
-                className='p-2 w-fit border rounded-lg bg-secondary hover:scale-105 hover:shadow-md cursor-pointer transition-all'
-                onClick={() => setOpenDialog(true)}
-            >
-                <h2 className='font-medium text-primary text-center'>Add Job Description</h2>
-            </div>
+            {jsonResponse.length === 0 && (
+                <div
+                    className='p-2 w-fit border rounded-lg bg-secondary hover:scale-105 hover:shadow-md cursor-pointer transition-all'
+                    onClick={() => setOpenDialog(true)}
+                >
+                    <h2 className='font-medium text-primary text-center'>Add Job Description</h2>
+                </div>
+            )}
             <Dialog open={openDialog}>
                 <DialogContent className='max-w-2xl'>
                     <DialogHeader>
-                        <DialogTitle className='text-2xl'>Tell us more about your job interview</DialogTitle>
+                        <DialogTitle className='text-2xl'>Tell us more about the job</DialogTitle>
                         <DialogDescription>
                             <form onSubmit={onSubmit}>
                                 <div>
@@ -116,7 +111,7 @@ const AtsScore = ({ pdfText }: RenderPdfProps) => {
                                         {loading ?
                                             <>
                                                 <LoaderCircle className='animate-spin' />Generating from AI
-                                            </> : 'Start Interview'
+                                            </> : 'Get your score'
                                         }
                                     </Button>
                                 </div>
@@ -127,40 +122,42 @@ const AtsScore = ({ pdfText }: RenderPdfProps) => {
             </Dialog>
             <div>
                 {Array.isArray(jsonResponse) && jsonResponse.map((item, index) => (
-                    <Collapsible key={index} className="mt-7">
-                        <CollapsibleTrigger className="p-2 bg-secondary rounded-lg my-2 text-left flex justify-between gap-7 w-full">
-                            Response
-                            <ChevronsUpDown className="h-5 w-5" />
-                        </CollapsibleTrigger>
-                        <CollapsibleContent>
-                            <div className="flex flex-col gap-2">
-                                <h2 className="p-2 border rounded-lg">
-                                    <strong>Rating: </strong>
-                                    {item.JDMatch}
-                                </h2>
-                                <h2 className="p-2 border rounded-lg text-sm bg-secondary">
-                                    <strong>Job Position </strong>
-                                    {jobPosition}
-                                </h2>
-                                <h2 className="p-2 border rounded-lg text-sm bg-secondary">
-                                    <strong>Job Description </strong>
-                                    {jobDesc}
-                                </h2>
-                                <h2 className="p-2 border rounded-lg text-sm bg-secondary">
-                                    <strong>Job Experience </strong>
-                                    {jobExperience}
-                                </h2>
-                                <h2 className="p-2 border rounded-lg text-sm bg-secondary">
-                                    <strong>Missing Keywords in your resume </strong>
-                                    {item.MissingKeywords}
-                                </h2>
-                                <h2 className="p-2 border rounded-lg text-sm bg-secondary">
-                                    <strong>Profile Summary </strong>
-                                    {item.ProfileSummary}
-                                </h2>
-                            </div>
-                        </CollapsibleContent>
-                    </Collapsible>
+                    <Dialog key={index}>
+                        <DialogTrigger className="my-5 rounded-xl bg-black border dark:border-white border-transparent text-white text-sm p-2">Response</DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Here&apos;s your resume score with feedback</DialogTitle>
+                                <DialogDescription>
+                                    <div className="flex flex-col gap-4 mt-4 font-mono">
+                                        <h2 className="p-2 border rounded-lg">
+                                            <strong>Rating: </strong>
+                                            {item.JDMatch}
+                                        </h2>
+                                        <h2 className="p-2 border rounded-lg text-sm bg-secondary">
+                                            <strong>Job Position: </strong>
+                                            {jobPosition}
+                                        </h2>
+                                        <h2 className="p-2 border rounded-lg text-sm bg-secondary">
+                                            <strong>Job Description: </strong>
+                                            {jobDesc}
+                                        </h2>
+                                        <h2 className="p-2 border rounded-lg text-primary bg-secondary">
+                                            <strong>Job Experience: </strong>
+                                            {jobExperience}
+                                        </h2>
+                                        <h2 className="p-2 border rounded-lg text-primary bg-secondary">
+                                            <strong>Missing Keywords in your resume: </strong>
+                                            {item.MissingKeywords}
+                                        </h2>
+                                        <h2 className="p-2 border rounded-lg text-primary bg-secondary max-h-[200px] overflow-y-auto">
+                                            <strong>Profile Summary: </strong>
+                                            {item.ProfileSummary}
+                                        </h2>
+                                    </div>
+                                </DialogDescription>
+                            </DialogHeader>
+                        </DialogContent>
+                    </Dialog>
                 ))}
             </div>
         </div>

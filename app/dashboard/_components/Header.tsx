@@ -1,4 +1,5 @@
 'use client'
+import { ModeToggle } from '@/components/ModeToggle'
 import { UserButton } from '@clerk/nextjs'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -8,8 +9,8 @@ import React from 'react'
 const Header = () => {
     const path = usePathname();
     return (
-        <div className='flex p-4 items-center justify-between bg-secondary shadow-md'>
-            <Image src={'/logo.svg'} width={160} height={100} alt='logo' />
+        <div className='flex p-4 items-center justify-between bg-secondary dark:bg-slate-950 border rounded-md shadow-md'>
+            <Link href="/"><Image src={'/logo.png'} width={30} height={30} alt='logo' /></Link>
             <ul className='hidden md:flex gap-6'>
                 <Link href="/dashboard">
                     <li
@@ -25,18 +26,18 @@ const Header = () => {
                     `}
                     >Resume</li>
                 </Link>
-                <li
-                    className={`hover:text-primary hover:font-bold transition-all cursor-pointer
-                    ${path == '/dashboard/upgrade' && 'font-bold text-primary'}  
-                    `}
-                >Upgrade</li>
-                <li
-                    className={`hover:text-primary hover:font-bold transition-all cursor-pointer
+                <Link href="/dashboard/about">
+                    <li
+                        className={`hover:text-primary hover:font-bold transition-all cursor-pointer
                     ${path == '/dashboard/how' && 'font-bold text-primary'}  
                     `}
-                >How it Works ?</li>
+                    >How it Works ?</li>
+                </Link>
             </ul>
-            <UserButton />
+            <div className='flex items-center justify-between gap-5'>
+                <ModeToggle />
+                <UserButton />
+            </div>
         </div>
     )
 }

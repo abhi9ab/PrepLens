@@ -42,7 +42,6 @@ const AddNewInterview = () => {
 
         try {
             const result = await chatSession.sendMessage(InputPrompt);
-            console.log(result.response.text());
             const MockJsonResp = (await result.response.text()).replace('```json', '').replace('```', '');
 
             setJsonResponse(JSON.parse(MockJsonResp));
@@ -63,7 +62,6 @@ const AddNewInterview = () => {
                 const data = await response.json();
 
                 if (response.ok) {
-                    console.log('Inserted Mock ID:', data.mockId);
                     router.push('/dashboard/interview/' + data.mockId);
                 } else {
                     console.error('Failed to insert data:', data.error);

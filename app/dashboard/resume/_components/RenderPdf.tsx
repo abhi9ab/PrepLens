@@ -53,7 +53,7 @@ const RenderPdf = () => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4 space-y-4 border border-black">
+    <div className="w-full max-w-4xl mx-auto p-4 space-y-4">
       <Card>
         <CardHeader>
           <CardTitle>Resume ATS Scanner</CardTitle>
