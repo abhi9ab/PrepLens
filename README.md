@@ -104,23 +104,6 @@ The application will now be available at `http://localhost:3000`.
 
 ---
 
-## File Structure
-```plaintext
-src/
-├── app/
-│   ├── page.tsx                # Main dashboard page
-│   ├── _components/
-│   │   ├── InterviewListServer.tsx  # Server Component for fetching data
-│   │   ├── InterviewListClient.tsx  # Client Component for rendering data
-├── lib/
-│   ├── prisma.ts               # Prisma client instance
-├── prisma/
-│   ├── schema.prisma           # Database schema definition
-.env                            # Environment variables
-```
-
----
-
 ## API Keys Needed
 This project requires the following API keys:
 
