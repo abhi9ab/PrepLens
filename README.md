@@ -144,5 +144,5 @@ This project requires the following API keys:
 ---
 
 ## Contact
-For further queries, please contact [your.email@example.com](mailto:abhinabdas@example.com).
+For further queries, please contact [abhinabdas004@gmail.com](mailto:abhinabdas004@gmail.com).
 
