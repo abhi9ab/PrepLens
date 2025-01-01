@@ -1,33 +1,64 @@
 # Interview Management System
 
-This project is a simple Interview Management System built with **Next.js** (App Router), **Prisma** as the ORM, and **PostgreSQL** as the database. The system allows managing mock interviews, fetching interview details, and displaying them using both server and client components in a structured way.
+Welcome to the AI-Powered Interview Preparation Platform! This innovative application bridges the gap between traditional placement preparation and real-world interview success by simulating realistic interviews, offering personalized feedback, evaluating resumes, and providing targeted technical training.
+
+---
+
+### Resume review
+![Screenshot From 2025-01-01 22-55-37](https://github.com/user-attachments/assets/f910532b-4dc5-46f5-8dcd-f89a77d6a338)
+
+### Face analysis
+![face-blur-for-preplens](https://github.com/user-attachments/assets/a79443ed-ff79-46c5-bed1-ec04f345d74e)
+
+### Feedback generation
+![Screenshot From 2025-01-01 22-55-58](https://github.com/user-attachments/assets/bfa287b3-de47-475e-b902-fb736f13ac2a)
+
 
 ---
 
 ## Features
-- **Server-Side Rendering (SSR):** Utilizes Server Components for fetching data.
-- **Interactive Client Components:** For rendering interactive interview details.
-- **Database Integration:** Built with Prisma and PostgreSQL.
-- **Generative AI Integration:** Uses the **Gemini-Flash-1.5-8b** model to generate interview questions, feedback for user answers, and ratings by comparing user responses with AI-generated answers.
-- **Speech Recognition:** Uses **Google Speech-to-Text API** for voice input.
-- **Modern UI:** Built with **shadcn** and **Tailwind CSS**.
+
+### 1. Realistic Interview Simulations  
+- **Question Generation:** Generates interview questions based on job descriptions.  
+- **Speech-to-Text Conversion:** Records and transcribes user responses using React Speech-to-Text.  
+- **Feedback & Rating:** Provides real-time feedback and ratings for each answer using Gemini AI.  
+
+### 2. Resume Analysis  
+- **ATS Scoring:** Analyzes uploaded resumes and generates ATS scores.  
+- **Keyword Suggestions:** Identifies missing keywords relevant to the job description.  
+
+### 3. Face and Posture Analysis  
+- **Real-Time Feedback:** Monitors user’s face and posture during mock interviews using Face-API.js.  
+- **Alert System: Alerts:** users if they move out of the webcam frame.  
+
+### 4. Comprehensive Feedback
+- **Detailed Reports:** Summarizes performance with actionable insights.  
+- **Confidence Building:** Enhances interview readiness with iterative practice and personalized guidance.  
 
 ---
 
-## Technologies Used
-- **Next.js** (App Router)
-- **Prisma** (ORM)
-- **PostgreSQL** (Database)
-- **React**
-- **Gemini-Flash-1.5-8b** (AI Model)
-- **Google Speech-to-Text API**
+## Tech Stack  
+
+### Frontend & Backend  
+**Next.js:** Framework for building the user interface.  
+**TypeScript:** Ensures type safety and scalability.  
+**ShadCN-UI:** Provides modern and accessible UI components.  
+**react-hook-peech-to-text:** Powers the speech recognition feature.  
+
+### AI & APIs  
+**Gemini AI:** Used for question generation, feedback, and resume ATS scoring.  
+**Face-API.js:** Powers real-time facial and posture analysis.  
+
+### Other Tools
+**Prisma:** Manages database interactions.  
+**Supabase:** Handles authentication and storage.  
+**Framer Motion:** Adds animations for a dynamic user experience.  
 
 ---
 
 ## Prerequisites
 1. Node.js (>= 16.x)
-2. PostgreSQL installed locally or a cloud-based instance.
-3. Environment variables configured (see `.env` section below).
+2. Environment variables configured (see `.env` section below).
 
 ---
 
@@ -36,10 +67,10 @@ This project is a simple Interview Management System built with **Next.js** (App
 ### 1. Clone the Repository
 ```bash
 # Clone this repository
-git clone https://github.com/abhi9ab/20th-dec-ps-1.git
+git clone https://github.com/abhi9ab/Interview-Preparation-App.git
 
 # Navigate into the project directory
-cd 20th-dec-ps-1
+cd Interview-Preparation-App
 ```
 
 ### 2. Install Dependencies
@@ -92,18 +123,6 @@ The application will now be available at `http://localhost:3000`.
 
 ---
 
-## Steps to Reproduce
-
-1. Clone the repository and follow the installation instructions above.
-2. Add mock data to the database using Prisma Studio:
-   ```bash
-   npx prisma studio
-   ```
-   Add entries to the `MockInterview` table with fields like `id`, `jobPosition`, `jobDesc`, `jobExperience`, etc.
-3. Visit the home page to see a list of interviews rendered from the database.
-
----
-
 ## API Keys Needed
 This project requires the following API keys:
 
@@ -123,16 +142,12 @@ This project requires the following API keys:
 
 ---
 
-## Known Issues
-
-1. **Hydration Mismatch Error:**
-   Ensure no server-side logic or dynamic data (like `Date.now()`) is used directly in Client Components.
-
-2. **PrismaClient Error:**
-   Make sure the Prisma Client is not bundled into browser-side code. All Prisma queries should run in Server Components or API routes.
-
-3. **Async/Await in Client Components:**
-   Avoid using async/await directly in Client Components. Use Server Components or API routes for asynchronous operations.
+## Contributing  
+**Contributions are welcome! Please follow these steps:**  
+- Fork the repository.  
+- Create a new branch for your feature or bugfix.  
+- Commit your changes and push to the branch.  
+- Submit a pull request.  
 
 ---
 
@@ -146,3 +161,5 @@ This project requires the following API keys:
 ## Contact
 For further queries, please contact [abhinabdas004@gmail.com](mailto:abhinabdas004@gmail.com).
 
+## License  
+This project is licensed under the MIT License. See the [LICENSE file](https://github.com/abhi9ab/Interview-Preparation-App/blob/main/LICENSE) for details.
