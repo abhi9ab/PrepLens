@@ -1,4 +1,6 @@
-# Interview Management System
+# PrepLens: Interview Management System
+
+## The Dev Challenge 2025: [Recognized as a Winner in the hackathon](https://devpost.com/software/preplens)
 
 Welcome to the AI-Powered Interview Preparation Platform! This innovative application bridges the gap between traditional placement preparation and real-world interview success by simulating realistic interviews, offering personalized feedback, evaluating resumes, and providing targeted technical training.
 
