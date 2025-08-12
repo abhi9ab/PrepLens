@@ -21,6 +21,7 @@ const AddNewInterview = () => {
     const [jobDesc, setJobDesc] = useState('');
     const [jobExperience, setJobExperience] = useState('');
     const [loading, setLoading] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [jsonResponse, setJsonResponse] = useState([]);
 
     const { user } = useUser();

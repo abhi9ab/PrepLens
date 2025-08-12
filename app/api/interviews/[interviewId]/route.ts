@@ -3,7 +3,10 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function GET(request: Request, { params }: { params: { interviewId: string } }) {
+export async function GET(
+    request: Request,
+    { params }: { params: Promise<{ interviewId: string }> }
+) {
     try {
         const { interviewId } = await params;
 

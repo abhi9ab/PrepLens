@@ -23,8 +23,8 @@ export async function POST(req: Request) {
         });
 
         return NextResponse.json({ mockId: response.mockId });
-    } catch (error: any) {
-        console.error('Error submitting data:', error?.message || error);
+    } catch (error) {
+        console.error('Error submitting data:', error);
         return NextResponse.json(
             { error: 'Failed to insert data' },
             { status: 500 }

@@ -75,7 +75,7 @@ cd Interview-Preparation-App
 
 ### 2. Install Dependencies
 ```bash
-npm install
+pnpm install
 ```
 
 ### 3. Configure Environment Variables
@@ -106,17 +106,17 @@ NEXT_PUBLIC_GOOGLE_API_KEY=
 
 1. Generate the Prisma Client:
 ```bash
-npx prisma generate
+pnpm exec prisma generate
 ```
 
 2. Apply migrations to the database:
 ```bash
-npx prisma migrate dev --name init
+pnpm exec prisma migrate dev --name init
 ```
 
 ### 5. Run the Development Server
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 The application will now be available at `http://localhost:3000`.

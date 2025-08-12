@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, StopCircle, WebcamIcon, AlertCircle } from 'lucide-react';
 import Webcam from 'react-webcam';
@@ -59,123 +59,15 @@ const RecordAnswerSection = ({ interviewQuestions, activeQuestionIndex, intervie
                     faceapi.nets.faceExpressionNet.loadFromUri('/models')
                 ]);
                 toast.success('Interview analysis ready');
-            } catch (err) {
+            } catch {
                 toast.error('Failed to load interview analysis models');
             }
         };
         loadModels();
     }, []);
 
-    // Real-time face analysis
-    useEffect(() => {
-        let interval: NodeJS.Timeout;
-
-        const analyzeFace = async () => {
-            if (webcamRef.current && webcamRef.current.video!.readyState === 4) {
-                const video = webcamRef.current.video;
-                const detection = await faceapi
-                    .detectSingleFace(video!, new faceapi.TinyFaceDetectorOptions())
-                    .withFaceLandmarks()
-                    .withFaceExpressions();
-
-                if (!detection) {
-                    if (isInFrame) {
-                        setIsInFrame(false);
-                        toast.warning('Please stay in frame during the interview');
-                    }
-                } else {
-                    if (!isInFrame) {
-                        setIsInFrame(true);
-                    }
-
-                    // Check eye contact (based on face angle)
-                    const landmarks = detection.landmarks;
-                    const nose = landmarks.getNose();
-                    const jawline = landmarks.getJawOutline();
-                    const faceAngle = Math.abs(Math.atan2(
-                        jawline[16].y - jawline[0].y,
-                        jawline[16].x - jawline[0].x
-                    ) * (180 / Math.PI));
-
-                    const hasEyeContact = faceAngle < 15;
-                    if (!hasEyeContact && eyeContact) {
-                        setEyeContact(false);
-                        toast.warning('Try to maintain eye contact');
-                    } else if (hasEyeContact && !eyeContact) {
-                        setEyeContact(true);
-                    }
-
-                    // Analyze emotions
-                    const expressions = detection.expressions;
-                    const dominantEmotion = Object.keys(expressions).reduce((a, b) =>
-                        expressions[a] > expressions[b] ? a : b
-                    );
-
-                    if (dominantEmotion !== emotion) {
-                        setEmotion(dominantEmotion);
-                        if (dominantEmotion === 'angry' || dominantEmotion === 'disgusted') {
-                            toast.warning('Try to maintain a positive expression');
-                        }
-                    }
-                }
-            }
-        };
-
-        if (isRecording) {
-            interval = setInterval(analyzeFace, analysisPeriod);
-        }
-
-        return () => clearInterval(interval);
-    }, [isRecording, isInFrame, eyeContact, emotion]);
-
-    // Monitor speaking pace
-    useEffect(() => {
-        if (results.length > 0) {
-            const currentTime = Date.now();
-            const timeDiff = currentTime - lastWordTimestamp;
-            const wordsSpoken = results[results.length - 1].transcript.split(' ').length;
-            const wordsPerMinute = (wordsSpoken / timeDiff) * 60000;
-
-            if (wordsPerMinute > 160) {
-                setSpeakingPace('fast');
-                toast.warning('Try to speak a bit slower');
-            } else if (wordsPerMinute < 120) {
-                setSpeakingPace('slow');
-                toast.warning('Try to speak a bit faster');
-            } else {
-                setSpeakingPace('normal');
-            }
-
-            setLastWordTimestamp(currentTime);
-        }
-    }, [results]);
-
-    // Original useEffect and functions...
-    useEffect(() => {
-        results.map((result) => (
-            setUserAnswer(prevAns => prevAns + result?.transcript)
-        ))
-    }, [results]);
-
-    useEffect(() => {
-        if (!isRecording && userAnswer.length > 10) {
-            updateUserAnswer();
-        }
-    }, [userAnswer]);
-
-    const startStopRecording = async () => {
-        if (isRecording) {
-            stopSpeechToText();
-        } else {
-            if (!isInFrame) {
-                toast.error('Please position yourself in frame before starting');
-                return;
-            }
-            startSpeechToText();
-        }
-    };
-
-    const updateUserAnswer = async () => {
+    // Memoize updateUserAnswer to avoid recreating on every render
+    const updateUserAnswer = useCallback(async () => {
         setLoading(true);
 
         const behavioralAnalysis = {
@@ -226,6 +118,121 @@ const RecordAnswerSection = ({ interviewQuestions, activeQuestionIndex, intervie
             setUserAnswer('');
             setResults([]);
             setLoading(false);
+        }
+    }, [userAnswer, eyeContact, emotion, speakingPace, interviewQuestions, activeQuestionIndex, interviewId, user, setResults]);
+
+    // Real-time face analysis
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+
+        const analyzeFace = async () => {
+            if (webcamRef.current && webcamRef.current.video!.readyState === 4) {
+                const video = webcamRef.current.video;
+                const detection = await faceapi
+                    .detectSingleFace(video!, new faceapi.TinyFaceDetectorOptions())
+                    .withFaceLandmarks()
+                    .withFaceExpressions();
+
+                if (!detection) {
+                    if (isInFrame) {
+                        setIsInFrame(false);
+                        toast.warning('Please stay in frame during the interview');
+                    }
+                } else {
+                    if (!isInFrame) {
+                        setIsInFrame(true);
+                    }
+
+                    // Check eye contact (based on face angle)
+                    const landmarks = detection.landmarks;
+                    const jawline = landmarks.getJawOutline();
+                    const faceAngle = Math.abs(Math.atan2(
+                        jawline[16].y - jawline[0].y,
+                        jawline[16].x - jawline[0].x
+                    ) * (180 / Math.PI));
+
+                    const hasEyeContact = faceAngle < 15;
+                    if (!hasEyeContact && eyeContact) {
+                        setEyeContact(false);
+                        toast.warning('Try to maintain eye contact');
+                    } else if (hasEyeContact && !eyeContact) {
+                        setEyeContact(true);
+                    }
+
+                    // Analyze emotions - Fix TypeScript error
+                    const expressions = detection.expressions;
+                    const emotionEntries = Object.entries(expressions) as [keyof typeof expressions, number][];
+                    const dominantEmotion = emotionEntries.reduce((a, b) =>
+                        expressions[a[0]] > expressions[b[0]] ? a : b
+                    )[0];
+
+                    if (dominantEmotion !== emotion) {
+                        setEmotion(dominantEmotion);
+                        if (dominantEmotion === 'angry' || dominantEmotion === 'disgusted') {
+                            toast.warning('Try to maintain a positive expression');
+                        }
+                    }
+                }
+            }
+        };
+
+        if (isRecording) {
+            interval = setInterval(analyzeFace, analysisPeriod);
+        }
+
+        return () => clearInterval(interval);
+    }, [isRecording, isInFrame, eyeContact, emotion]);
+
+    // Monitor speaking pace - Fix TypeScript error
+    useEffect(() => {
+        if (results.length > 0) {
+            const currentTime = Date.now();
+            const timeDiff = currentTime - lastWordTimestamp;
+            const lastResult = results[results.length - 1];
+            
+            // Handle both string and ResultType
+            const transcript = typeof lastResult === 'string' ? lastResult : lastResult.transcript;
+            const wordsSpoken = transcript.split(' ').length;
+            const wordsPerMinute = (wordsSpoken / timeDiff) * 60000;
+
+            if (wordsPerMinute > 160) {
+                setSpeakingPace('fast');
+                toast.warning('Try to speak a bit slower');
+            } else if (wordsPerMinute < 120) {
+                setSpeakingPace('slow');
+                toast.warning('Try to speak a bit faster');
+            } else {
+                setSpeakingPace('normal');
+            }
+
+            setLastWordTimestamp(currentTime);
+        }
+    }, [results, lastWordTimestamp]);
+
+    // Update user answer when speech results change - Fix TypeScript error
+    useEffect(() => {
+        results.forEach((result) => {
+            const transcript = typeof result === 'string' ? result : result.transcript;
+            setUserAnswer(prevAns => prevAns + transcript);
+        });
+    }, [results]);
+
+    // Call updateUserAnswer when recording stops and answer is long enough
+    useEffect(() => {
+        if (!isRecording && userAnswer.length > 10) {
+            updateUserAnswer();
+        }
+    }, [isRecording, userAnswer, updateUserAnswer]);
+
+    const startStopRecording = async () => {
+        if (isRecording) {
+            stopSpeechToText();
+        } else {
+            if (!isInFrame) {
+                toast.error('Please position yourself in frame before starting');
+                return;
+            }
+            startSpeechToText();
         }
     };
 

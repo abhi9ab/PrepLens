@@ -39,8 +39,10 @@ const StartInterview = () => {
             }
         };
 
-        fetchData();
-    }, []);
+        if (validInterviewId) {
+            fetchData();
+        }
+    }, [validInterviewId]);
 
     return (
         <div className='my-10'>

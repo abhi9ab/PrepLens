@@ -1,11 +1,11 @@
 import InterviewClient from "./InterviewClient";
 import { prisma } from "@/lib/prisma";
 
-interface Params {
-    params: { interviewId: string };
+interface PageProps {
+    params: Promise<{ interviewId: string }>;
 }
 
-export default async function InterviewPage({ params }: Params) {
+export default async function InterviewPage({ params }: PageProps) {
     const { interviewId } = await params;
 
     const interview = await prisma.mockInterview.findUnique({

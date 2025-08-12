@@ -9,8 +9,9 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+
+// Import the proper type from Prisma
+import { JsonValue } from "@prisma/client/runtime/library";
 
 interface FeedbackItem {
     id: number;
@@ -20,7 +21,11 @@ interface FeedbackItem {
     correctAnswer: string;
     feedback: string;
     behavioralFeedback: string;
-    behavioralMetrics: JSON;
+    behavioralMetrics: JsonValue; // Changed from JSON to JsonValue
+    // Add other fields that come from Prisma
+    mockIdRef: string;
+    userEmail: string;
+    createdAt: string;
 }
 
 interface FeedbackClientProps {
@@ -28,7 +33,6 @@ interface FeedbackClientProps {
 }
 
 const FeedbackClient = ({ feedbackList }: FeedbackClientProps) => {
-    const router = useRouter();
 
     const overallRating = Math.round(
         feedbackList.reduce((sum, item) => sum + (Number(item.rating) || 0), 0) / feedbackList.length || 0
@@ -75,6 +79,21 @@ const FeedbackClient = ({ feedbackList }: FeedbackClientProps) => {
                                                     <strong>Feedback: </strong>
                                                     {item.feedback}
                                                 </h2>
+                                                {item.behavioralFeedback && (
+                                                    <h2 className="p-2 border rounded-lg text-blue-600 bg-blue-50 dark:bg-blue-950">
+                                                        <strong>Behavioral Feedback: </strong>
+                                                        {item.behavioralFeedback}
+                                                    </h2>
+                                                )}
+                                                {item.behavioralMetrics && (
+                                                    <h2 className="p-2 border rounded-lg text-green-600 bg-green-50 dark:bg-green-950">
+                                                        <strong>Behavioral Metrics: </strong>
+                                                        {typeof item.behavioralMetrics === 'object' 
+                                                            ? JSON.stringify(item.behavioralMetrics, null, 2)
+                                                            : String(item.behavioralMetrics)
+                                                        }
+                                                    </h2>
+                                                )}
                                             </div>
                                         </DialogDescription>
                                     </DialogHeader>
