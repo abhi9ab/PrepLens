@@ -29,8 +29,15 @@ const RecordAnswerSection = ({ interviewQuestions, activeQuestionIndex, intervie
     const [speakingPace, setSpeakingPace] = useState('normal');
     const [lastWordTimestamp, setLastWordTimestamp] = useState(Date.now());
 
+    // Add state to track last notification times to prevent spam
+    const [lastFrameWarning, setLastFrameWarning] = useState(0);
+    const [lastEyeContactWarning, setLastEyeContactWarning] = useState(0);
+    const [lastExpressionWarning, setLastExpressionWarning] = useState(0);
+    const [lastPaceWarning, setLastPaceWarning] = useState(0);
+
     // Face detection interval
     const analysisPeriod = 1000; // Check every second
+    const notificationCooldown = 5000; // 5 seconds between similar notifications
 
     const {
         isRecording,
@@ -58,7 +65,9 @@ const RecordAnswerSection = ({ interviewQuestions, activeQuestionIndex, intervie
                     faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
                     faceapi.nets.faceExpressionNet.loadFromUri('/models')
                 ]);
-                toast.success('Interview analysis ready');
+                toast.success('Interview analysis ready', {
+                    duration: 2000,
+                });
             } catch {
                 toast.error('Failed to load interview analysis models');
             }
@@ -104,7 +113,9 @@ const RecordAnswerSection = ({ interviewQuestions, activeQuestionIndex, intervie
             });
 
             if (response.ok) {
-                toast.success('Answer and behavioral analysis saved!');
+                toast.success('Answer and behavioral analysis saved!', {
+                    duration: 3000,
+                });
                 setUserAnswer('');
                 setResults([]);
             } else {
@@ -121,7 +132,7 @@ const RecordAnswerSection = ({ interviewQuestions, activeQuestionIndex, intervie
         }
     }, [userAnswer, eyeContact, emotion, speakingPace, interviewQuestions, activeQuestionIndex, interviewId, user, setResults]);
 
-    // Real-time face analysis
+    // Real-time face analysis with limited notifications
     useEffect(() => {
         let interval: NodeJS.Timeout;
 
@@ -133,10 +144,18 @@ const RecordAnswerSection = ({ interviewQuestions, activeQuestionIndex, intervie
                     .withFaceLandmarks()
                     .withFaceExpressions();
 
+                const now = Date.now();
+
                 if (!detection) {
                     if (isInFrame) {
                         setIsInFrame(false);
-                        toast.warning('Please stay in frame during the interview');
+                        // Only show notification if enough time has passed
+                        if (now - lastFrameWarning > notificationCooldown) {
+                            toast.warning('Please stay in frame during the interview', {
+                                duration: 2000,
+                            });
+                            setLastFrameWarning(now);
+                        }
                     }
                 } else {
                     if (!isInFrame) {
@@ -154,12 +173,17 @@ const RecordAnswerSection = ({ interviewQuestions, activeQuestionIndex, intervie
                     const hasEyeContact = faceAngle < 15;
                     if (!hasEyeContact && eyeContact) {
                         setEyeContact(false);
-                        toast.warning('Try to maintain eye contact');
+                        if (now - lastEyeContactWarning > notificationCooldown) {
+                            toast.warning('Try to maintain eye contact', {
+                                duration: 2000,
+                            });
+                            setLastEyeContactWarning(now);
+                        }
                     } else if (hasEyeContact && !eyeContact) {
                         setEyeContact(true);
                     }
 
-                    // Analyze emotions - Fix TypeScript error
+                    // Analyze emotions
                     const expressions = detection.expressions;
                     const emotionEntries = Object.entries(expressions) as [keyof typeof expressions, number][];
                     const dominantEmotion = emotionEntries.reduce((a, b) =>
@@ -168,8 +192,12 @@ const RecordAnswerSection = ({ interviewQuestions, activeQuestionIndex, intervie
 
                     if (dominantEmotion !== emotion) {
                         setEmotion(dominantEmotion);
-                        if (dominantEmotion === 'angry' || dominantEmotion === 'disgusted') {
-                            toast.warning('Try to maintain a positive expression');
+                        if ((dominantEmotion === 'angry' || dominantEmotion === 'disgusted') &&
+                            now - lastExpressionWarning > notificationCooldown) {
+                            toast.warning('Try to maintain a positive expression', {
+                                duration: 2000,
+                            });
+                            setLastExpressionWarning(now);
                         }
                     }
                 }
@@ -181,15 +209,15 @@ const RecordAnswerSection = ({ interviewQuestions, activeQuestionIndex, intervie
         }
 
         return () => clearInterval(interval);
-    }, [isRecording, isInFrame, eyeContact, emotion]);
+    }, [isRecording, isInFrame, eyeContact, emotion, lastFrameWarning, lastEyeContactWarning, lastExpressionWarning]);
 
-    // Monitor speaking pace - Fix TypeScript error
+    // Monitor speaking pace with limited notifications
     useEffect(() => {
         if (results.length > 0) {
             const currentTime = Date.now();
             const timeDiff = currentTime - lastWordTimestamp;
             const lastResult = results[results.length - 1];
-            
+
             // Handle both string and ResultType
             const transcript = typeof lastResult === 'string' ? lastResult : lastResult.transcript;
             const wordsSpoken = transcript.split(' ').length;
@@ -197,19 +225,29 @@ const RecordAnswerSection = ({ interviewQuestions, activeQuestionIndex, intervie
 
             if (wordsPerMinute > 160) {
                 setSpeakingPace('fast');
-                toast.warning('Try to speak a bit slower');
+                if (currentTime - lastPaceWarning > notificationCooldown) {
+                    toast.warning('Try to speak a bit slower', {
+                        duration: 2000,
+                    });
+                    setLastPaceWarning(currentTime);
+                }
             } else if (wordsPerMinute < 120) {
                 setSpeakingPace('slow');
-                toast.warning('Try to speak a bit faster');
+                if (currentTime - lastPaceWarning > notificationCooldown) {
+                    toast.warning('Try to speak a bit faster', {
+                        duration: 2000,
+                    });
+                    setLastPaceWarning(currentTime);
+                }
             } else {
                 setSpeakingPace('normal');
             }
 
             setLastWordTimestamp(currentTime);
         }
-    }, [results, lastWordTimestamp]);
+    }, [results, lastWordTimestamp, lastPaceWarning]);
 
-    // Update user answer when speech results change - Fix TypeScript error
+    // Update user answer when speech results change
     useEffect(() => {
         results.forEach((result) => {
             const transcript = typeof result === 'string' ? result : result.transcript;
@@ -251,7 +289,7 @@ const RecordAnswerSection = ({ interviewQuestions, activeQuestionIndex, intervie
                     }}
                 />
                 {!isInFrame && (
-                    <div className="absolute top-0 left-0 right-0 bg-red-500 text-white p-2 rounded-t-lg text-center">
+                    <div className="absolute top-0 left-0 right-0 bg-red-500 text-white p-2 rounded-t-lg text-center z-20">
                         <AlertCircle className="inline mr-2" />
                         Please position yourself in frame
                     </div>
@@ -263,6 +301,11 @@ const RecordAnswerSection = ({ interviewQuestions, activeQuestionIndex, intervie
                         <p>Eye Contact: {eyeContact ? '👍' : '👀'}</p>
                         <p>Expression: {emotion === 'neutral' ? '😐' : emotion === 'happy' ? '😊' : '🤨'}</p>
                         <p>Speaking Pace: {speakingPace === 'normal' ? '✅' : speakingPace === 'fast' ? '⚡' : '🐌'}</p>
+                        {!isInFrame && (
+                            <p className="text-red-500 font-semibold animate-pulse">
+                                ⚠️ Please stay in frame
+                            </p>
+                        )}
                     </div>
                 )}
             </div>

@@ -14,7 +14,19 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
       >
         <Header />
         <div className='mx-5 md:mx-20 lg:mx-36'>
-          <Toaster />
+          <Toaster 
+            position="top-center"
+            expand={true}
+            richColors
+            closeButton
+            duration={2000}
+            offset={16}
+            toastOptions={{
+              style: {
+                zIndex: 9999,
+              },
+            }}
+          />
           {children}
         </div>
       </ThemeProvider>
