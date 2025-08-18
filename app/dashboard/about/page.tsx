@@ -38,7 +38,7 @@ const AboutPage = () => {
                     </CardHeader>
                     <CardContent>
                         <ul className="list-disc list-inside space-y-2">
-                            <li>Generate personalized interview questions and feedback using <Badge>Gemini API</Badge>.</li>
+                            <li>Generate personalized interview questions and feedback using <Badge>Gemini</Badge>.</li>
                             <li>Convert speech to text seamlessly with <Badge>React Speech-to-Text</Badge>.</li>
                             <li>Analyze and improve resumes with ATS scoring and keyword suggestions powered by <Badge>Gemini</Badge>.</li>
                             <li>Real-time facial expression and posture analysis using <Badge>Face-api.js</Badge>.</li>
@@ -58,7 +58,7 @@ const AboutPage = () => {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="flex items-center gap-2">
                                 <Info className="w-5 h-5 text-primary" />
-                                <span>next.js & typeScript</span>
+                                <span>next.js & typescript</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Lightbulb className="w-5 h-5 text-primary" />
